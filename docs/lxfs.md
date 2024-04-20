@@ -112,6 +112,7 @@ Note that the first 33 blocks of the partition are always reserved for the boot 
 
 _Table 6: Block allocation table special values_
 | Value | Description |
+| ----- | ----------- |
 | `0x0000000000000000` | Empty block that can be allocated to a new file or directory |
 | `0x0000000000000001` | Unusable block – reserved for identification block (i.e. block 0) |
 | `0x0000000000000002 - 0x0000000000000020` | Unusable block - reserved for future expansion |
