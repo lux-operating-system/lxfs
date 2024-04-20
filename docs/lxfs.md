@@ -47,7 +47,7 @@ _Table 2: Identification and boot sector_
 | 16 | 8 | Size of partition in blocks |
 | 24 | 8 | First block of the root directory |
 | 32 | 1 | Medium and partition parameters |
-| 33 | 15 | (Optional) Volume name, ASCII text |
+| 33 | 15 | (Optional) Volume name, ASCII, null terminated if less than 15 characters |
 | 48 | 462 | (Optional) Boot code for an x86 boot loader |
 | 510 | 2 | (Optional) Boot signature for an x86 boot loader, `0xAA55` |
 
@@ -89,7 +89,7 @@ _Table 4: Boot loader header structure_
 | 0 | 4 | LXFS identification, `'LXFS'` or `0x5346584C` |
 | 4 | 4 | Architecture family of the boot program |
 | 8 | 8 | Timestamp of last modification, Unix time, seconds |
-| 16 | 32 | (Optional) Description of the operating system installed, ASCII text |
+| 16 | 32 | (Optional) Description of the operating system installed, ASCII, null terminated if less than 32 characters |
 | 48 | 16 | Reserved for alignment |
 | 64 | n | Boot code |
 
@@ -107,7 +107,7 @@ _Table 4: Boot loader header structure_
     All other values are undefined and are reserved for future expansion as deemed necessary.
 
 ### 4.4. Block allocation table
-The block allocation table is the most integral component to the _lxfs_ file system and is analogous to the file allocation table of the FAT family of file systems. It is merely an array that indicates both whether or not a block is used, as well as what the next block in the chain of blocks is.
+The block allocation table is the most integral component to the _lxfs_ file system and is analogous to the file allocation table of the FAT family of file systems. It indicates both whether or not a block is used, as well as what the next block in the chain of blocks is.
 
 The size of the partition in blocks is given by the identification sector, and the size of the block allocation table can thus be calculated according to the formula shown in _section 4.2_.
 
@@ -128,4 +128,67 @@ _Table 6: Block allocation table special values_
 | `0xFFFFFFFFFFFFFFFF` | Terminal block in a chain (i.e. end-of-file) |
 
 All other values not shown in the table indicate the next block in the chain of succession.
+
+The blocks following the block allocation table are the data blocks that are used for file and directory storage.
+
+### 4.5. Directories
+_lxfs_ implements a hierarchical directory structure beginning with the root directory, whose starting block number is given by the identification sector. Every directory begins with a header identifying metadata about the directory, followed by an array of entries, each of which describes a file, a link, or another directory. Both structures are given below.
+
+_Table 7: Directory structure_
+
+| Offset | Size | Description |
+| ------ | ---- | ----------- |
+| 0 | 8 | Timestamp of creation, Unix time, seconds |
+| 8 | 8 | Timestamp of last modification, Unix time, seconds |
+| 16 | 8 | Timestamp of last access, Unix time, seconds |
+| 24 | 8 | Size of this directory in number of entries |
+| 32 | 8 | Size of this directory in number of bytes |
+| 40 | 8 | Reserved for future expansion |
+| 48 | n | Directory entries |
+
+_n_ is an arbitrary value in this case, as the number of directory entries is variable, as is the size of each directory entry, as shown in the following table.
+
+_Table 8: Directory entry structure_
+
+| Offset | Size | Description |
+| ------ | ---- | ----------- |
+| 0 | 2 | General flags |
+| 2 | 2 | Owner ID |
+| 4 | 2 | Group ID |
+| 6 | 2 | Permissions |
+| 8 | 8 | Size |
+| 16 | 8 | Timestamp of creation, Unix time, seconds |
+| 24 | 8 | Timestamp of last modification, Unix time, seconds |
+| 32 | 8 | Timestamp of last access, Unix time, seconds |
+| 40 | 8 | First data block |
+| 48 | 16 | Reserved for future expansion |
+| 64 | n | Entry name, UTF-8, null-terminated |
+
+* **General flags:** This 16-bit word defines what type of entry this is according to the following bitmap.
+
+    _Table 9: Directory entry flags_
+
+    | Bit Offset | Bit Count | Description |
+    | ---------- | --------- | ----------- |
+    | 0 | 1 | Valid bit |
+    | 1 | 2 | Entry type (0 = file, 1 = directory, 2 = soft (symbolic) link, 3 = hard link)
+    | 3 | 9 | Entry name length minus 1, allowing for file names up to 512 characters |
+    | 12 | 4 | Reserved for future expansion |
+
+* **Permissions:** This field implements Unix file permissions.
+
+    | Bit Offset | Bit Count | Description |
+    | ---------- | --------- | ----------- |
+    | 0 | 1 | Read permission for owner |
+    | 1 | 1 | Write permission for owner |
+    | 2 | 1 | Execute permission for owner |
+    | 3 | 1 | Read permission for group |
+    | 4 | 1 | Write permission for group |
+    | 5 | 1 | Execute permission for group |
+    | 6 | 1 | Read permission for others |
+    | 7 | 1 | Write permission for others |
+    | 8 | 1 | Execute permission for others |
+    | 9 | 7 | Reserved for future expansion |
+
+* **Size:** This field depends on context. For files and hard links, it indicates the size of the file in bytes. For directories, it indicates the number of entries within the directory. For soft links, it can indicate either according to whether the soft link links to a file or a directory.
 
