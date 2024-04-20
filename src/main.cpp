@@ -15,9 +15,9 @@ int help(char *name) {
     cerr << " bootblk   - Copies a boot block to the partition" << endl;
     cerr << " cat       - Retrieves a file from the disk image" << endl;
     cerr << " copy      - Copies a file onto the disk image" << endl;
-    cerr << " create    - Creates an lxfs volume on a disk image" << endl;
+    cerr << " create    - Creates a disk image" << endl;
+    cerr << " format    - Creates and formats an lxfs volume on a disk image" << endl;
     cerr << " help      - Shows this message" << endl;
-    cerr << " image     - Create an empty disk image" << endl;
     cerr << " mkdir     - Creates a directory on the disk image" << endl;
     cerr << " part      - Shows the partition table of the disk image" << endl;
 
