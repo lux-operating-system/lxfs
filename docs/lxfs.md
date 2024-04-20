@@ -39,7 +39,7 @@ Offset and size are given in bytes for all the following tables.
 | ------ | ---- | ----------- |
 | 0 | 4 | (Optional) Boot code for an x86 boot loader |
 | 4 | 4 | Partition identification, `'LXFS'` or `0x5346584C` |
-| 8 | 8 | Last mount time, Unix time in seconds |
+| 8 | 8 | Last access time, Unix time in seconds |
 | 16 | 8 | Size of partition in blocks |
 | 24 | 8 | First block of the root directory |
 | 32 | 1 | Medium and partition parameters |
@@ -62,4 +62,10 @@ Offset and size are given in bytes for all the following tables.
     | 3 | 4 | Sectors per block |
     | 7 | 1 | Reserved – should be zero until future expansion |
 
-    * **Bootable bit:** 
+    * **Bootable bit:** One indicates that there is a boot program within the boot loader blocks.
+    * **Sector size:** Size of the physical sector in bytes given by the following formula. This allows for sector sizes of 512, 1024, 2048, and 4096.
+        ```
+        BYTES_PER_SECTOR = 512 << SECTOR_SIZE
+        ```
+    * **Sectors per block:** Number of physical sectors per block minus 1. As such, this value ranging from 0 to 15 allows for block sizes of 1 to 16 sectors per block.
+
