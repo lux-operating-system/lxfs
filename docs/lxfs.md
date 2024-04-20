@@ -123,8 +123,8 @@ _Table 6: Block allocation table special values_
 | `0x0000000000000000` | Empty block that can be allocated to a new file or directory |
 | `0x0000000000000001 - 0x0000000000000020` | Unusable block - reserved for future expansion |
 | `0xFFFFFFFFFFFFFF00 - 0xFFFFFFFFFFFFFFFB` | Unusable block – reserved for future expansion |
-| `0xFFFFFFFFFFFFFFFC` | Unusable block - contains bad sectors |
-| `0xFFFFFFFFFFFFFFFB` | Unusable block – reserved for identification block (i.e. block 0) |
+| `0xFFFFFFFFFFFFFFFB` | Unusable block - contains bad sectors |
+| `0xFFFFFFFFFFFFFFFC` | Unusable block – reserved for identification block (i.e. block 0) |
 | `0xFFFFFFFFFFFFFFFD` | Unusable block – reserved for boot loader blocks (i.e. blocks 1-32) |
 | `0xFFFFFFFFFFFFFFFE` | Unusable block – reserved for block allocation table |
 | `0xFFFFFFFFFFFFFFFF` | Terminal block in a chain (i.e. end-of-file) |
