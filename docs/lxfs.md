@@ -177,6 +177,8 @@ _Table 8: Directory entry structure_
 
 * **Permissions:** This field implements Unix file permissions.
 
+    _Table 10: Directory entry Unix permissions_
+
     | Bit Offset | Bit Count | Description |
     | ---------- | --------- | ----------- |
     | 0 | 1 | Read permission for owner |
@@ -191,4 +193,22 @@ _Table 8: Directory entry structure_
     | 9 | 7 | Reserved for future expansion |
 
 * **Size:** This field depends on context. For files and hard links, it indicates the size of the file in bytes. For directories, it indicates the number of entries within the directory. For soft links, it can indicate either according to whether the soft link links to a file or a directory.
+
+### 4.6. Files and hard links
+Files in _lxfs_ are defined by a directory entry type value equal to 0, and hard links are defined by a directory entry value of 3. Hard links are essentially a mirror copy of a file by linking to the same starting block in the directory entry, and thus the same subsequent chain of blocks.
+
+For both files and hard links, the first block linked to by the directory entry contains metadata meant to enable the functionality of hard links. The second block as indicated by the block allocation table then contains the start of the actual contents of the file, and so forth for the remaining blocks within the chain.
+
+The metadata structure is defined as follows. Assume _n_ is however many bytes are remaining to take up an entire block.
+
+_Table 11: File and hard link metadata_
+
+| Offset | Size | Description |
+| ------ | ---- | ----------- |
+| 0 | 8 | Number of references to this file |
+| 8 | n | Reserved for future expansion |
+
+Any block reference by a directory entry is considered a valid reference to said block regardless of type. For this reason, when a new file is created, it starts with a reference count of one. Subsequent hard links to said file would each increment the reference count by one. Deletion of a file or hard link decrements this counter, and the block allocation is updated to zeroes (free blocks) when the number of references reaches zero, i.e. when the file and all its hard links are permanently deleted.
+
+Note that the file size as indicated by the directory entry indicates the size of the file's data, and does not include this metadata. Thus, every file takes up exactly one extra block than it would given its data size alone.
 
