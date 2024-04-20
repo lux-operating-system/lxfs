@@ -88,6 +88,7 @@ The first block contains a short identification structure regarding the boot pro
 * **Architecture family:** This field determines the CPU architecture that the boot program is written for. It can take on several values.
 
     | Value | Description |
+    | ----- | ----------- |
     | `0x00000001` | 32-bit x86 |
     | `0x00000002` | 64-bit x86 |
     | `0x00000003` | 32-bit MIPS |
