@@ -46,8 +46,9 @@ _Table 2: Identification and boot sector_
 | 8 | 8 | Size of partition in blocks |
 | 16 | 8 | First block of the root directory |
 | 24 | 1 | Medium and partition parameters |
-| 25 | 16 | (Optional) Volume name, ASCII, null-terminated if less than 16 characters |
-| 41 | 7 | Reserved for future expansion |
+| 25 | 1 | _lxfs_ version, `0x01` for this draft |
+| 26 | 16 | (Optional) Volume name, ASCII, null-terminated if less than 16 characters |
+| 42 | 6 | Reserved for future expansion |
 | 48 | 462 | (Optional) Boot code for an x86 boot loader |
 | 510 | 2 | (Optional) Boot signature for an x86 boot loader, `0xAA55` |
 
@@ -198,7 +199,7 @@ _Table 8: Directory entry structure_
 
     Note again that the root directory is the only directory that not contain a corresponding directory entry linking to it, and thus does not have a field defining its permissions. The permissions of the root directory should always be assumed to be rwxr-xr-x, or full permissions for the owner (root), and permission to read and execute but not writing for other users.
 
-* **Size:** This field depends on context. For files and hard links, it indicates the size of the file in bytes. For directories, it indicates the number of entries within the directory. For soft links, it can indicate either according to whether the soft link links to a file or a directory.
+* **Size:** This field depends on context. For directories, it indicates the number of entries within the directory. For files and hard links, it indicates the size of the file in bytes. For soft links, it can indicate either according to whether the soft link links to a file or a directory. Note that in the case of files or links to files, due to the redundancy of updating this field for every other link that exists to the same file, this field should be avoided, and instead the file size should be read from the file metadata as described in the next section.
 
 * **Owner ID:** The logic underlying this field is OS-specific, but it is highly recommended that a value of `0x0000` be used to represent the user `root` as this is the value that will be used within _lux_ itself.
 
@@ -213,12 +214,15 @@ _Table 11: File and hard link metadata_
 
 | Offset | Size | Description |
 | ------ | ---- | ----------- |
-| 0 | 8 | Number of references to this file |
-| 8 | n | Reserved for future expansion |
+| 0 | 8 | File size in bytes |
+| 16 | 8 | Number of references to this file |
+| 24 | n | Reserved for future expansion |
 
 Any block reference by a directory entry is considered a valid reference to said block regardless of type. For this reason, when a new file is created, it starts with a reference count of one. Subsequent hard links to said file would each increment the reference count by one. Deletion of a file or hard link decrements this counter, and the block allocation is updated to zeroes (free blocks) when the number of references reaches zero, i.e. when the file and all its hard links are permanently deleted.
 
-Note that the file size as indicated by the directory entry indicates the size of the file's data, and does not include this metadata. Thus, every file takes up exactly one extra block than it would given its data size alone.
+Note that the file size as indicated by the directory entry, as well as here, indicates the size of the file's data, and does not include this metadata. Thus, every file takes up exactly one extra block than it would given its data size alone.
+
+It is also highly recommended to use this field to determine file size and not that in the directory entry, due to the redundancy of updating every directory entry of every link for a given file.
 
 ### 4.7. Soft (symbolic) links
 Soft links are non-persisting links to a file or a directory. It contrasts with hard links in that hard links can only link to files but not directories, and that hard links remain valid even if the file is deleted, whereas soft links are invalidated once the linked file or directory is deleted. In more technical terms, hard links create a mirror copy of a file by directly linking to its block, while soft links only link to the file or directory's reference, which is invalidated when the file or directory is deleted.
