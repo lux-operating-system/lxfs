@@ -16,13 +16,13 @@ _lxfs_ uses little-endian ordering for all multibyte values.
 ## 3. Identification
 Parititons formatted with _lxfs_ can be identified via the Master Boot Record or the GUID Partition Table depending on how the medium is formatted. In the case of Master Boot Records, the partition ID identifying _lxfs_ is `0xF3`. On a GUID Partition Table, _lxfs_ is defined by the UUID `25EB9A8C-E69D-4F3B-AE09-D8FBEA1E02A0`.
 
-## 4. Partition
+## 4. Structure
 _lxfs_ assumes it is on a sector-addressable physical medium. For backwards compatibility, _lxfs_ also leaves space for a traditional boot loader running from the boot sector, for legacy x86 systems.
 
 ### 4.1. Outline
 The following table outlines the overall structure of _lxfs_ on its partition. Assume that _n_ refers to the block size, in number of sectors. _m_ refers to the size of the block allocation table in sectors. The calculation regarding this is discussed further below, in the block allocation table section. _z_ refers to however many sectors are left until the end of the partition.
 
-| Sector | Sector Count | Description |
+| Sector | Count | Description |
 | ------ | ----- | ----------- |
 | 0 | 1 | Identification sector, as well as boot sector for legacy x86 systems |
 | 1 | n-1 | Reserved sectors – may be used in future expansions |
@@ -39,7 +39,7 @@ Offset and size are given in bytes for all the following tables.
 | ------ | ---- | ----------- |
 | 0 | 4 | (Optional) Boot code for an x86 boot loader |
 | 4 | 4 | Partition identification, `'LXFS'` or `0x5346584C` |
-| 8 | 8 | Last access time, Unix time in seconds |
+| 8 | 8 | Timestamp of last access, Unix time, seconds |
 | 16 | 8 | Size of partition in blocks |
 | 24 | 8 | First block of the root directory |
 | 32 | 1 | Medium and partition parameters |
@@ -57,15 +57,40 @@ Offset and size are given in bytes for all the following tables.
 
     | Bit Offset | Bit Count | Description |
     | ---------- | --------- | ----------- |
-    | 0 | 1 | Bootable bit |
+    | 0 | 1 | Boot flag |
     | 1 | 2 | Sector size |
     | 3 | 4 | Sectors per block |
     | 7 | 1 | Reserved – should be zero until future expansion |
 
-    * **Bootable bit:** One indicates that there is a boot program within the boot loader blocks.
+    * **Boot flag:** One indicates that there is a boot program within the boot loader blocks.
     * **Sector size:** Size of the physical sector in bytes given by the following formula. This allows for sector sizes of 512, 1024, 2048, and 4096.
         ```
         BYTES_PER_SECTOR = 512 << SECTOR_SIZE
         ```
     * **Sectors per block:** Number of physical sectors per block minus 1. As such, this value ranging from 0 to 15 allows for block sizes of 1 to 16 sectors per block.
 
+### 4.3. Boot loader blocks
+Blocks 1 through 32 inclusive are reserved for an optional boot program, as indicated by the boot flag in the identification sector. If the boot flag is set to zero, the contents of the boot loader blocks are undefined and should not be used.
+
+Due to the variability in sector size and block size, this program may be limited to as little as 16 KB (assuming one sector per block and a sector size of 512 bytes) or as much as 2 MB (assuming 16 sectors per block and a maximum sector size of 4096 bytes). Because of this disparsity that can ultimately depend on the physical device _lxfs_ is formatted on, it is highly recommended to keep boot programs below 16 KB, or better yet, to store them on files rather than the reserved boot loader blocks.
+
+The first block contains a short identification structure regarding the boot program present immediately after it. Assume _n_ is however many bytes are occupied by the boot program, which can be structured in any format as deemed useful by the boot program authors.
+
+| Offset | Size | Description |
+| ------ | ---- | ----------- |
+| 0 | 4 | LXFS identification, `'LXFS'` or `0x5346584C` |
+| 4 | 4 | Architecture family of the boot program |
+| 8 | 8 | Timestamp of last modification, Unix time, seconds |
+| 16 | 32 | (Optional) Description of the operating system installed, ASCII text |
+| 48 | 16 | Reserved for alignment |
+| 64 | n | Boot code |
+
+* **Architecture family:** This field determines the CPU architecture that the boot program is written for. It can take on several values.
+
+    | Value | Description |
+    | `0x00000001` | 32-bit x86 |
+    | `0x00000002` | 64-bit x86 |
+    | `0x00000003` | 32-bit MIPS |
+    | `0x00000004` | 64-bit MIPS |
+
+    All other values are undefined and are reserved for future expansion as deemed necessary.
