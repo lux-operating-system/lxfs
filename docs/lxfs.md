@@ -43,11 +43,11 @@ _Table 2: Identification and boot sector_
 | ------ | ---- | ----------- |
 | 0 | 4 | (Optional) Boot code for an x86 boot loader |
 | 4 | 4 | Partition identification, `'LXFS'` or `0x5346584C` |
-| 8 | 8 | Timestamp of last access, Unix time, seconds |
-| 16 | 8 | Size of partition in blocks |
-| 24 | 8 | First block of the root directory |
-| 32 | 1 | Medium and partition parameters |
-| 33 | 15 | (Optional) Volume name, ASCII, null terminated if less than 15 characters |
+| 8 | 8 | Size of partition in blocks |
+| 16 | 8 | First block of the root directory |
+| 24 | 1 | Medium and partition parameters |
+| 25 | 16 | (Optional) Volume name, ASCII, null-terminated if less than 16 characters |
+| 41 | 7 | Reserved for future expansion |
 | 48 | 462 | (Optional) Boot code for an x86 boot loader |
 | 510 | 2 | (Optional) Boot signature for an x86 boot loader, `0xAA55` |
 
@@ -89,7 +89,7 @@ _Table 4: Boot loader header structure_
 | 0 | 4 | LXFS identification, `'LXFS'` or `0x5346584C` |
 | 4 | 4 | Architecture family of the boot program |
 | 8 | 8 | Timestamp of last modification, Unix time, seconds |
-| 16 | 32 | (Optional) Description of the operating system installed, ASCII, null terminated if less than 32 characters |
+| 16 | 32 | (Optional) Description of the operating system installed, ASCII, null-terminated if less than 32 characters |
 | 48 | 16 | Reserved for alignment |
 | 64 | n | Boot code |
 
@@ -138,15 +138,19 @@ _Table 7: Directory structure_
 
 | Offset | Size | Description |
 | ------ | ---- | ----------- |
-| 0 | 8 | Timestamp of creation, Unix time, seconds |
-| 8 | 8 | Timestamp of last modification, Unix time, seconds |
-| 16 | 8 | Timestamp of last access, Unix time, seconds |
+| 0 | 8 | Timestamp of creation, Unix time, seconds (1) (2) |
+| 8 | 8 | Timestamp of last modification, Unix time, seconds (1) |
+| 16 | 8 | Timestamp of last access, Unix time, seconds (1) |
 | 24 | 8 | Size of this directory in number of entries |
 | 32 | 8 | Size of this directory in number of bytes |
 | 40 | 8 | Reserved for future expansion |
 | 48 | n | Directory entries |
 
-_n_ is an arbitrary value in this case, as the number of directory entries is variable, as is the size of each directory entry, as shown in the following table.
+_n_ is an arbitrary value in this case, as the number of directory entries is variable, as is the size of each directory entry, as shown in the table below.
+
+**(1)** The timestamp values are only valid for the root directory because it is the only directory that does not have a directory entry structure. For all other directories, these 3 fields may or may not be updated appropriately for performance reasons and to avoid redundacy. The timestamps given in the directory entry should be used instead.
+
+**(2)** The creation timestamp of the root directory indicates the time this volume was created and formatted. 
 
 _Table 8: Directory entry structure_
 
