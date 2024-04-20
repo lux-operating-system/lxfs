@@ -23,6 +23,7 @@ _lxfs_ assumes it is on a sector-addressable physical medium. For backwards comp
 The following table outlines the overall structure of _lxfs_ on its partition. Assume that _n_ refers to the block size, in number of sectors. _m_ refers to the size of the block allocation table in sectors. The calculation regarding this is discussed further below, in the block allocation table section. _z_ refers to however many sectors are left until the end of the partition.
 
 _Table 1: Partition structure outline_
+
 | Sector | Count | Description |
 | ------ | ----- | ----------- |
 | 0 | 1 | Identification sector, as well as boot sector for legacy x86 systems |
@@ -37,6 +38,7 @@ The first sector of an _lxfs_ partition is the sector identifying the partition'
 Offset and size are given in bytes for all the following tables.
 
 _Table 2: Identification and boot sector_
+
 | Offset | Size | Description |
 | ------ | ---- | ----------- |
 | 0 | 4 | (Optional) Boot code for an x86 boot loader |
@@ -58,6 +60,7 @@ _Table 2: Identification and boot sector_
 * **Medium and partition parameters:** This field is one byte that identifies details about the partition and the underlying medium. It is defined as follows.
 
     _Table 3: Medium and partition parameters_
+
     | Bit Offset | Bit Count | Description |
     | ---------- | --------- | ----------- |
     | 0 | 1 | Boot flag |
@@ -80,6 +83,7 @@ Due to the variability in sector size and block size, this program may be limite
 The first block contains a short identification header structure regarding the boot program present immediately after it. Assume _n_ is however many bytes are occupied by the boot program, which can be structured in any format as deemed useful by the boot program authors.
 
 _Table 4: Boot loader header structure_
+
 | Offset | Size | Description |
 | ------ | ---- | ----------- |
 | 0 | 4 | LXFS identification, `'LXFS'` or `0x5346584C` |
@@ -92,6 +96,7 @@ _Table 4: Boot loader header structure_
 * **Architecture family:** This field determines the CPU architecture that the boot program is written for. It can take on several values.
 
     _Table 5: Boot loader CPU architecture family_
+
     | Value | Description |
     | ----- | ----------- |
     | `0x00000001` | 32-bit x86 |
@@ -111,6 +116,7 @@ In essense, the block allocation table is merely an array of 64-bit integers, wh
 Note that the first 33 blocks of the partition are always reserved for the boot program, and then the number of blocks reserved for the block allocation table itself is also variable according to the partition size. For this reason, there are several special values for block numbers that are reserved to signify end-of-file and reserved blocks.
 
 _Table 6: Block allocation table special values_
+
 | Value | Description |
 | ----- | ----------- |
 | `0x0000000000000000` | Empty block that can be allocated to a new file or directory |
