@@ -22,6 +22,7 @@ _lxfs_ assumes it is on a sector-addressable physical medium. For backwards comp
 ### 4.1. Outline
 The following table outlines the overall structure of _lxfs_ on its partition. Assume that _n_ refers to the block size, in number of sectors. _m_ refers to the size of the block allocation table in sectors. The calculation regarding this is discussed further below, in the block allocation table section. _z_ refers to however many sectors are left until the end of the partition.
 
+_Table 1: Partition structure outline_
 | Sector | Count | Description |
 | ------ | ----- | ----------- |
 | 0 | 1 | Identification sector, as well as boot sector for legacy x86 systems |
@@ -35,6 +36,7 @@ The first sector of an _lxfs_ partition is the sector identifying the partition'
 
 Offset and size are given in bytes for all the following tables.
 
+_Table 2: Identification and boot sector_
 | Offset | Size | Description |
 | ------ | ---- | ----------- |
 | 0 | 4 | (Optional) Boot code for an x86 boot loader |
@@ -50,11 +52,12 @@ Offset and size are given in bytes for all the following tables.
 * **Size of partition in blocks:** This field contains the total size of the partition in blocks, including the identification sector, reserved sectors, boot loader blocks, and all other contents of the partition. This can also be used to calculate the size of the block allocation table in sectors. The size of the block allocation table is given as:
 
     ```
-    ceil( SIZE_IN_BLOCKS * 8 / BYTES_PER_SECTOR )
+    BLOCK_ALLOCATION_TABLE_SIZE_SECTORS = ceil( SIZE_IN_BLOCKS * 8 / BYTES_PER_SECTOR )
     ```
 
 * **Medium and partition parameters:** This field is one byte that identifies details about the partition and the underlying medium. It is defined as follows.
 
+    _Table 3: Medium and partition parameters_
     | Bit Offset | Bit Count | Description |
     | ---------- | --------- | ----------- |
     | 0 | 1 | Boot flag |
@@ -74,8 +77,9 @@ Blocks 1 through 32 inclusive are reserved for an optional boot program, as indi
 
 Due to the variability in sector size and block size, this program may be limited to as little as 16 KB (assuming one sector per block and a sector size of 512 bytes) or as much as 2 MB (assuming 16 sectors per block and a maximum sector size of 4096 bytes). Because of this disparsity that can ultimately depend on the physical device _lxfs_ is formatted on, it is highly recommended to keep boot programs below 16 KB, or better yet, to store them on files rather than the reserved boot loader blocks.
 
-The first block contains a short identification structure regarding the boot program present immediately after it. Assume _n_ is however many bytes are occupied by the boot program, which can be structured in any format as deemed useful by the boot program authors.
+The first block contains a short identification header structure regarding the boot program present immediately after it. Assume _n_ is however many bytes are occupied by the boot program, which can be structured in any format as deemed useful by the boot program authors.
 
+_Table 4: Boot loader header structure_
 | Offset | Size | Description |
 | ------ | ---- | ----------- |
 | 0 | 4 | LXFS identification, `'LXFS'` or `0x5346584C` |
@@ -87,6 +91,7 @@ The first block contains a short identification structure regarding the boot pro
 
 * **Architecture family:** This field determines the CPU architecture that the boot program is written for. It can take on several values.
 
+    _Table 5: Boot loader CPU architecture family_
     | Value | Description |
     | ----- | ----------- |
     | `0x00000001` | 32-bit x86 |
@@ -95,3 +100,25 @@ The first block contains a short identification structure regarding the boot pro
     | `0x00000004` | 64-bit MIPS |
 
     All other values are undefined and are reserved for future expansion as deemed necessary.
+
+### 4.4. Block allocation table
+The block allocation table is the most integral component to the _lxfs_ file system and is analogous to the file allocation table of the FAT family of file systems. It is merely an array that indicates both whether or not a block is used, as well as what the next block in the chain of blocks is.
+
+The size of the partition in blocks is given by the identification sector, and the size of the block allocation table can thus be calculated according to the formula shown in _section 4.2_.
+
+In essense, the block allocation table is merely an array of 64-bit integers, where the number of entries of the array is equal to the number of blocks in the partition. Each value in this array indicates the next block in the chain of blocks containing a given file or directory. For example, if a file starts at block 729 which is read, and then the array entry at index 729 contains 822, then the next block to be read would be 822, and then the subsequent block would be given by index 822, and so forth until the terminal block is reached.
+
+Note that the first 33 blocks of the partition are always reserved for the boot program, and then the number of blocks reserved for the block allocation table itself is also variable according to the partition size. For this reason, there are several special values for block numbers that are reserved to signify end-of-file and reserved blocks.
+
+_Table 6: Block allocation table special values_
+| Value | Description |
+| `0x0000000000000000` | Empty block that can be allocated to a new file or directory |
+| `0x0000000000000001` | Unusable block – reserved for identification block (i.e. block 0) |
+| `0x0000000000000002 - 0x0000000000000020` | Unusable block - reserved for future expansion |
+| `0xFFFFFFFFFFFFFF00 - 0xFFFFFFFFFFFFFFFC` | Unusable block – reserved for future expansion |
+| `0xFFFFFFFFFFFFFFFD` | Unusable block – reserved for boot loader blocks (i.e. blocks 1-32) |
+| `0xFFFFFFFFFFFFFFFE` | Unusable block – reserved for block allocation table |
+| `0xFFFFFFFFFFFFFFFF` | Terminal block in a chain (i.e. end-of-file) |
+
+All other values not shown in the table indicate the next block in the chain of succession.
+
