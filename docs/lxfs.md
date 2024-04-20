@@ -220,3 +220,12 @@ Any block reference by a directory entry is considered a valid reference to said
 
 Note that the file size as indicated by the directory entry indicates the size of the file's data, and does not include this metadata. Thus, every file takes up exactly one extra block than it would given its data size alone.
 
+### 4.7. Soft (symbolic) links
+Soft links are non-persisting links to a file or a directory. It contrasts with hard links in that hard links can only link to files but not directories, and that hard links remain valid even if the file is deleted, whereas soft links are invalidated once the linked file or directory is deleted. In more technical terms, hard links create a mirror copy of a file by directly linking to its block, while soft links only link to the file or directory's reference, which is invalidated when the file or directory is deleted.
+
+_lxfs_ implements soft links with a directory entry type value equal to 2. The chain of blocks pointed to by the directory entry yields the location of the file or directory being linked to.
+
+| Offset | Size | Description |
+| ------ | ---- | ----------- |
+| 0 | n | Full path to the file or directory being linked to, UTF-8, null-terminated |
+
