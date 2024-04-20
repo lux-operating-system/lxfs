@@ -196,7 +196,11 @@ _Table 8: Directory entry structure_
     | 8 | 1 | Execute permission for others |
     | 9 | 7 | Reserved for future expansion |
 
+    Note again that the root directory is the only directory that not contain a corresponding directory entry linking to it, and thus does not have a field defining its permissions. The permissions of the root directory should always be assumed to be rwxr-xr-x, or full permissions for the owner (root), and permission to read and execute but not writing for other users.
+
 * **Size:** This field depends on context. For files and hard links, it indicates the size of the file in bytes. For directories, it indicates the number of entries within the directory. For soft links, it can indicate either according to whether the soft link links to a file or a directory.
+
+* **Owner ID:** The logic underlying this field is OS-specific, but it is highly recommended that a value of `0x0000` be used to represent the user `root` as this is the value that will be used within _lux_ itself.
 
 ### 4.6. Files and hard links
 Files in _lxfs_ are defined by a directory entry type value equal to 0, and hard links are defined by a directory entry value of 3. Hard links are essentially a mirror copy of a file by linking to the same starting block in the directory entry, and thus the same subsequent chain of blocks.
