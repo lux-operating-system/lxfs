@@ -14,3 +14,4 @@
 
 using namespace std;
 
+int create(int, char **);
