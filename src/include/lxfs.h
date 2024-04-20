@@ -9,8 +9,10 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include <cstddef>      // size_t
 #include <cstdint>      // integers
+#include <string>
 
 using namespace std;
 

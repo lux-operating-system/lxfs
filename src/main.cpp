@@ -6,10 +6,9 @@
  */
 
 #include <lxfs.h>
-#include <cstring>
 
 int help(char *name) {
-    cerr << "Usage: " << name << " [command] [disk image] [parameters]" << endl;
+    cerr << "Usage: " << name << " [command] [parameters]" << endl;
     cerr << "Available commands:" << endl;
     cerr << " boot      - Makes an lxfs volume bootable" << endl;
     cerr << " bootsec   - Copies a boot sector to the partition" << endl;
@@ -26,9 +25,7 @@ int help(char *name) {
 }
 
 int main(int argc, char **argv) {
-    if(argc <= 1 || !strcmp(argv[1], "help")) {
-        return help(argv[0]);
-    }
+    if(argc <= 1 || !strcmp(argv[1], "help")) return help(argv[0]);
 
     if(!strcmp(argv[1], "create")) {
         return create(argc, argv);
