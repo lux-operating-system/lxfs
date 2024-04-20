@@ -56,6 +56,7 @@ Offset and size are given in bytes for all the following tables.
 * **Medium and partition parameters:** This field is one byte that identifies details about the partition and the underlying medium. It is defined as follows.
 
     | Bit Offset | Bit Count | Description |
+    | ---------- | --------- | ----------- |
     | 0 | 1 | Bootable bit |
     | 1 | 2 | Sector size |
     | 3 | 4 | Sectors per block |
