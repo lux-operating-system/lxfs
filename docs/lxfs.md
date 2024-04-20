@@ -50,5 +50,15 @@ Offset and size are given in bytes for all the following tables.
 * **Size of partition in blocks:** This field contains the total size of the partition in blocks, including the identification sector, reserved sectors, boot loader blocks, and all other contents of the partition. This can also be used to calculate the size of the block allocation table in sectors. The size of the block allocation table is given as:
 
     ```
-    ceil( SIZE_IN_BLOCKS * 8 / SECTORS_PER_BLOCK )
+    ceil( SIZE_IN_BLOCKS * 8 / BYTES_PER_SECTOR )
     ```
+
+* **Medium and partition parameters:** This field is one byte that identifies details about the partition and the underlying medium. It is defined as follows.
+
+    | Bit Offset | Bit Count | Description |
+    | 0 | 1 | Bootable bit |
+    | 1 | 2 | Sector size |
+    | 3 | 4 | Sectors per block |
+    | 7 | 1 | Reserved – should be zero until future expansion |
+
+    * **Bootable bit:** 
