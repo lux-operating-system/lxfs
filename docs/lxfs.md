@@ -167,7 +167,8 @@ _Table 8: Directory entry structure_
 | 24 | 8 | Timestamp of last modification, Unix time, seconds |
 | 32 | 8 | Timestamp of last access, Unix time, seconds |
 | 40 | 8 | First data block |
-| 48 | 16 | Reserved for future expansion |
+| 48 | 2 | Entry size |
+| 50 | 14 | Reserved for future expansion |
 | 64 | n | Entry name, UTF-8, null-terminated |
 
 * **General flags:** This 16-bit word defines what type of entry this is according to the following bitmap.
@@ -179,7 +180,10 @@ _Table 8: Directory entry structure_
     | 0 | 1 | Valid bit |
     | 1 | 2 | Entry type (0 = file, 1 = directory, 2 = soft (symbolic) link, 3 = hard link)
     | 3 | 9 | Entry name length minus 1, allowing for file names up to 512 characters |
-    | 12 | 4 | Reserved for future expansion |
+    | 12 | 1 | Deleted bit |
+    | 13 | 3 | Reserved for future expansion |
+
+    * **Deleted bit:** One indicates an entry that has been deleted and can now be reused. This is only used to preserve the entry size field, so that a file system driver can traverse onto the next entry skipping over the deleted entry. When this bit is set to one, all other fields should be zero except for the entry size.
 
 * **Permissions:** This field implements Unix file permissions.
 
@@ -203,6 +207,8 @@ _Table 8: Directory entry structure_
 * **Size:** This field depends on context. For directories, it indicates the number of entries within the directory. For files and hard links, it indicates the size of the file in bytes. For soft links, it can indicate either according to whether the soft link links to a file or a directory. Note that in the case of files or links to files, due to the redundancy of updating this field for every other link that exists to the same file, this field should be avoided, and instead the file size should be read from the file metadata as described in the next section.
 
 * **Owner ID:** The logic underlying this field is OS-specific, but it is highly recommended that a value of `0x0000` be used to represent the user `root` as this is the value that will be used within _lux_ itself.
+
+* **Entry size:** This field is used to skip over this entry onto the next, so that a file that was deleted does not mandate relocating the entirety of the directory.
 
 ### 4.6. Files and hard links
 Files in _lxfs_ are defined by a directory entry type value equal to 0, and hard links are defined by a directory entry value of 3. Hard links are essentially a mirror copy of a file by linking to the same starting block in the directory entry, and thus the same subsequent chain of blocks.
