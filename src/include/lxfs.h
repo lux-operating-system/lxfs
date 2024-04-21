@@ -19,6 +19,7 @@ using namespace std;
 
 #define SECTOR_SIZE         512     // default
 #define BLOCK_SIZE          4       // 4 sectors per block, just a default
+#define BLOCK_SIZE_BYTES    (SECTOR_SIZE*BLOCK_SIZE)
 
 int create(int, char **);
 int format(int, char **);
@@ -28,6 +29,8 @@ void *readBytes(string, size_t, size_t, void *);
 void writeBytes(string, size_t, size_t, void *);
 void *readSector(string, size_t, size_t, void *);
 void writeSector(string, size_t, size_t, void *);
+void *readBlock(string, int, size_t, size_t, void *);
+void writeBlock(string, int, size_t, size_t, void *);
 
 typedef struct {
     uint8_t flags;

@@ -30,3 +30,21 @@ void *readSector(string filename, size_t start, size_t count, void *buffer) {
 void writeSector(string filename, size_t start, size_t count, void *buffer) {
     writeBytes(filename, start*SECTOR_SIZE, count*SECTOR_SIZE, buffer);
 }
+
+uint32_t getPartitionStart(string filename, int partition) {
+    vector<uint8_t> mbr(SECTOR_SIZE);
+    readSector(filename, 0, 1, mbr.data());
+    MBRPartition *partitions = (MBRPartition *)((uint8_t *)mbr.data() + MBR_PARTITION_OFFSET);
+
+    return partitions[partition%4].start;
+}
+
+void *readBlock(string filename, int partition, size_t start, size_t count, void *buffer) {
+    uint32_t partitionStart = getPartitionStart(filename, partition);
+    return readSector(filename, (start*BLOCK_SIZE)+partitionStart, count*BLOCK_SIZE, buffer);
+}
+
+void writeBlock(string filename, int partition, size_t start, size_t count, void *buffer) {
+    uint32_t partitionStart = getPartitionStart(filename, partition);
+    writeSector(filename, (start*BLOCK_SIZE)+partitionStart, count*BLOCK_SIZE, buffer);
+}
