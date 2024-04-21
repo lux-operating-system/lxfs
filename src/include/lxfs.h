@@ -109,7 +109,8 @@ typedef struct {
     uint64_t accessTime;
 
     uint64_t block;
-    uint8_t reserved[16];
+    uint16_t entrySize;
+    uint8_t reserved[14];
     uint8_t name[];
 } __attribute__((packed)) LXFSDirectoryEntry;
 
