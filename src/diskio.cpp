@@ -7,14 +7,14 @@
 
 #include <lxfs.h>
 
-void *readBytes(string filename, size_t start, size_t count) {
+vector<uint8_t> readBytes(string filename, size_t start, size_t count) {
     vector<uint8_t> buffer(count);
     ifstream file(filename, ios::in | ios::binary);
     file.seekg(start);
     file.read((char *)buffer.data(), count);
     file.close();
 
-    return buffer.data();
+    return buffer;
 }
 
 void writeBytes(string filename, size_t start, size_t count, void *buffer) {
@@ -24,7 +24,7 @@ void writeBytes(string filename, size_t start, size_t count, void *buffer) {
     file.close();
 }
 
-void *readSector(string filename, size_t start, size_t count) {
+vector<uint8_t> readSector(string filename, size_t start, size_t count) {
     return readBytes(filename, start*SECTOR_SIZE, count*SECTOR_SIZE);
 }
 
