@@ -61,7 +61,12 @@ int format(int argc, char **argv) {
             id->name[0] = 0;
             id->volumeSize = volumeSizeBlocks;
             id->rootBlock = dataBlocks;
+            id->parameters = (SECTOR_SIZE >> 9) & 0x06;
+            id->parameters |= ((BLOCK_SIZE-1) << 3);
+            //cerr << "parameters 0x" << hex << (uint32_t)id->parameters << endl;
             writeSector(disk, startSector, 1, identifier.data());
+
+            
 
             return 0;
         }
