@@ -18,8 +18,9 @@ int format(int argc, char **argv) {
     string disk = (string)argv[2];
     size_t size = stoi(argv[3]);
 
-    void *mbr = readSector(disk, 0, 1).data();  // first sector
-    MBRPartition *partitions = (MBRPartition *)((uint8_t *)mbr + MBR_PARTITION_OFFSET);
+    vector<uint8_t> mbr(SECTOR_SIZE);
+    readSector(disk, 0, 1, mbr.data());
+    MBRPartition *partitions = (MBRPartition *)((uint8_t *)mbr.data() + MBR_PARTITION_OFFSET);
 
     // find a free starting sector
     uint32_t startSector = 0;
@@ -45,7 +46,7 @@ int format(int argc, char **argv) {
 
             // TODO: is it still necessary to calculate CHS? does BIOS/UEFI still check for this?
 
-            writeSector(disk, 0, 1, mbr);
+            writeSector(disk, 0, 1, mbr.data());
 
             // TODO: construct the actual file system here
             return 0;
