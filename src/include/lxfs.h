@@ -117,6 +117,7 @@ typedef struct {
 #define LXFS_DIR_VALID              0x0001
 #define LXFS_DIR_TYPE_SHIFT         1
 #define LXFS_DIR_TYPE_MASK          0x03
+#define LXFS_DIR_DELETED            0x1000
 
 #define LXFS_DIR_TYPE_FILE          0x00
 #define LXFS_DIR_TYPE_DIR           0x01
