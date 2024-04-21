@@ -28,6 +28,19 @@ vector<uint8_t> readSector(string, size_t, size_t);
 void writeSector(string, size_t, size_t, void *);
 
 typedef struct {
+    uint8_t flags;
+    uint8_t chsStart[3];
+    uint8_t id;
+    uint8_t chsEnd[3];
+    uint32_t start;
+    uint32_t size;
+} __attribute__((packed)) MBRPartition;
+
+#define MBR_PARTITION_OFFSET        446
+#define MBR_FLAG_BOOTABLE           0x80
+#define MBR_ID_LXFS                 0xF3
+
+typedef struct {
     uint8_t bootCode1[4];
     uint32_t identifier;
     uint64_t volumeSize;
