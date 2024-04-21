@@ -50,7 +50,7 @@ int format(int argc, char **argv) {
 
             // now construct the file system
             uint64_t volumeSizeBlocks = (size * (1048576/SECTOR_SIZE)) / BLOCK_SIZE;
-            uint64_t blockTableSizeBlocks = ((volumeSizeBlocks * 8) / SECTOR_SIZE) / BLOCK_SIZE;
+            uint64_t blockTableSizeBlocks = ((((volumeSizeBlocks * 8) + SECTOR_SIZE-1) / SECTOR_SIZE) + BLOCK_SIZE-1) / BLOCK_SIZE;
             uint64_t dataBlocks = 33 + blockTableSizeBlocks;
 
             // identification block/boot sector
@@ -66,7 +66,36 @@ int format(int argc, char **argv) {
             //cerr << "parameters 0x" << hex << (uint32_t)id->parameters << endl;
             writeSector(disk, startSector, 1, identifier.data());
 
-            
+            // create a block allocation table
+            vector<uint64_t> blockTable(blockTableSizeBlocks*BLOCK_SIZE_BYTES/8);
+
+            // reserve the ID block
+            blockTable[0] = LXFS_BLOCK_ID;
+
+            // next 32 blocks are reserved for a boot program
+            for(int j = 1; j < 33; j++) {
+                blockTable[j] = LXFS_BLOCK_BOOT;
+            }
+
+            // next n blocks are reserved for the block allocation table itself
+            for(int j = 0; j < blockTableSizeBlocks; j++) {
+                blockTable[j+33] = LXFS_BLOCK_TABLE;
+            }
+
+            // all other blocks are reserved, except for the root directory - handle this later
+            for(int j = blockTableSizeBlocks+33; j < volumeSizeBlocks; j++) {
+                blockTable[j] = LXFS_BLOCK_FREE;
+            }
+
+            // now mark the root directory block as EOF because it initially only takes up one block
+            blockTable[dataBlocks] = LXFS_BLOCK_EOF;
+
+            writeBlock(disk, i, 33, blockTableSizeBlocks, blockTable.data());
+
+            cerr << "partition size in blocks: " << dec << volumeSizeBlocks << endl;
+            cerr << "block table size in blocks: " << dec << blockTableSizeBlocks << endl;
+            cerr << "start of data blocks: " << dec << dataBlocks << endl;
+            cerr << "percentage of volume available for data: " << dec << ((volumeSizeBlocks-dataBlocks) * 100) / volumeSizeBlocks << "%" << endl;
 
             return 0;
         }
