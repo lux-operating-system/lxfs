@@ -97,6 +97,23 @@ int format(int argc, char **argv) {
             cerr << "start of data blocks: " << dec << dataBlocks << endl;
             cerr << "percentage of volume available for data: " << dec << ((volumeSizeBlocks-dataBlocks) * 100) / volumeSizeBlocks << "%" << endl;
 
+            // now build the root directory
+            time_t now = time(nullptr);
+
+            vector<uint8_t> rootDir(BLOCK_SIZE_BYTES);
+            for(int j = 0; j < BLOCK_SIZE_BYTES; j++) {
+                rootDir[j] = 0;
+            }
+
+            LXFSDirectoryHeader *root = (LXFSDirectoryHeader *)rootDir.data();
+            root->createTime = (uint64_t)now;
+            root->accessTime = (uint64_t)now;
+            root->modTime = (uint64_t)now;
+            root->sizeBytes = sizeof(LXFSDirectoryHeader);
+            root->sizeEntries = 0;      // no files on disk
+
+            writeBlock(disk, i, dataBlocks, 1, rootDir.data());
+
             return 0;
         }
     }
