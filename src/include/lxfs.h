@@ -21,10 +21,11 @@ using namespace std;
 
 int create(int, char **);
 int format(int, char **);
+int part(int, char **);
 
-vector<uint8_t> readBytes(string, size_t, size_t);
+void *readBytes(string, size_t, size_t, void *);
 void writeBytes(string, size_t, size_t, void *);
-vector<uint8_t> readSector(string, size_t, size_t);
+void *readSector(string, size_t, size_t, void *);
 void writeSector(string, size_t, size_t, void *);
 
 typedef struct {
