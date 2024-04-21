@@ -17,7 +17,8 @@
 
 using namespace std;
 
-#define SECTOR_SIZE         512     // or 4096
+#define SECTOR_SIZE         512     // default
+#define BLOCK_SIZE          4       // 4 sectors per block, just a default
 
 int create(int, char **);
 int format(int, char **);

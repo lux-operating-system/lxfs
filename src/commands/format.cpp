@@ -48,7 +48,21 @@ int format(int argc, char **argv) {
 
             writeSector(disk, 0, 1, mbr.data());
 
-            // TODO: construct the actual file system here
+            // now construct the file system
+            uint64_t volumeSizeBlocks = (size * (1048576/SECTOR_SIZE)) / BLOCK_SIZE;
+            uint64_t blockTableSizeBlocks = ((volumeSizeBlocks * 8) / SECTOR_SIZE) / BLOCK_SIZE;
+            uint64_t dataBlocks = 33 + blockTableSizeBlocks;
+
+            // identification block/boot sector
+            vector<uint8_t> identifier(SECTOR_SIZE);
+            LXFSIdentification *id = (LXFSIdentification *)identifier.data();
+            id->identifier = LXFS_MAGIC;
+            id->version = LXFS_VERSION;
+            id->name[0] = 0;
+            id->volumeSize = volumeSizeBlocks;
+            id->rootBlock = dataBlocks;
+            writeSector(disk, startSector, 1, identifier.data());
+
             return 0;
         }
     }
