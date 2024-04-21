@@ -46,6 +46,8 @@ int format(int argc, char **argv) {
             // TODO: is it still necessary to calculate CHS? does BIOS/UEFI still check for this?
 
             writeSector(disk, 0, 1, mbr);
+
+            // TODO: construct the actual file system here
             return 0;
         }
     }
