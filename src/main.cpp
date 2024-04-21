@@ -29,6 +29,8 @@ int main(int argc, char **argv) {
 
     if(!strcmp(argv[1], "create")) {
         return create(argc, argv);
+    } else if(!strcmp(argv[1], "format")) {
+        return format(argc, argv);
     }
 
     cerr << "Undefined command " << argv[1] << ", use '" << argv[0] << " help' for a list of commands." << endl;

@@ -17,13 +17,15 @@
 
 using namespace std;
 
+#define SECTOR_SIZE         512     // or 4096
+
 int create(int, char **);
 int format(int, char **);
 
-vector<uint8_t> readBytes(string, size_t, size_t);
-void writeBytes(string, size_t, size_t);
-vector<uint8_t> readSector(string, size_t, size_t);
-void writeSector(string, size_t, size_t);
+void *readBytes(string, size_t, size_t);
+void writeBytes(string, size_t, size_t, void *);
+void *readSector(string, size_t, size_t);
+void writeSector(string, size_t, size_t, void *);
 
 typedef struct {
     uint8_t bootCode1[4];
