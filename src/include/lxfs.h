@@ -25,6 +25,7 @@ using namespace std;
 int create(int, char **);
 int format(int, char **);
 int part(int, char **);
+int ls(int, char **);
 
 void *readBytes(string, size_t, size_t, void *);
 void writeBytes(string, size_t, size_t, void *);
@@ -33,6 +34,7 @@ void writeSector(string, size_t, size_t, void *);
 void *readBlock(string, int, size_t, size_t, void *);
 void writeBlock(string, int, size_t, size_t, void *);
 uint64_t readNextBlock(string, int, uint64_t, void *);
+int countPath(string);
 
 typedef struct {
     uint8_t flags;
