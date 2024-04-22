@@ -32,6 +32,7 @@ void *readSector(string, size_t, size_t, void *);
 void writeSector(string, size_t, size_t, void *);
 void *readBlock(string, int, size_t, size_t, void *);
 void writeBlock(string, int, size_t, size_t, void *);
+uint64_t readNextBlock(string, int, uint64_t, void *);
 
 typedef struct {
     uint8_t flags;
