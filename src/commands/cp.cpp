@@ -19,6 +19,65 @@ int cp(int argc, char **argv) {
     int partition = stoi(argv[3]);
     string src = argv[4];
     string dst = argv[5];
+    string parent = parentPath(dst);
 
-    return 0;
+    // get the parent directory
+    LXFSDirectoryEntry *parentEntry = new LXFSDirectoryEntry;
+    if(!findEntry(disk, partition, parent, parentEntry)) {
+        cerr << "directory " << parent << " does not exist";
+        return -1;
+    }
+
+    if(((parentEntry->flags >> LXFS_DIR_TYPE_SHIFT) & LXFS_DIR_TYPE_MASK) != LXFS_DIR_TYPE_DIR) {
+        cerr << parent << " is not a directory";
+        return -1;
+    }
+
+    // now load the parent directory, block by block
+    uint64_t current = parentEntry->block;
+    size_t size = 0, newSize = 0;
+    vector<uint8_t> parentData(0);
+
+    while(current != LXFS_BLOCK_EOF) {
+        newSize += BLOCK_SIZE_BYTES;
+        parentData.resize(newSize);
+        current = readNextBlock(disk, partition, current, parentData.data() + size);
+        size = newSize;
+    }
+
+    // look for a free entry
+    LXFSDirectoryEntry *newEntry = (LXFSDirectoryEntry *)((char *)parentData.data() + sizeof(LXFSDirectoryHeader));
+    size_t offset = sizeof(LXFSDirectoryHeader);
+    while(offset < size) {
+        //cout << "offset " << dec << offset << endl;
+        if(!(newEntry->flags & LXFS_DIR_VALID)) {
+            // found a free entry
+            newEntry->flags = LXFS_DIR_VALID;
+            newEntry->flags |= (LXFS_DIR_TYPE_FILE << LXFS_DIR_TYPE_MASK);
+
+            newEntry->owner = LXFS_USER_ROOT;
+            newEntry->group = LXFS_USER_ROOT;
+            newEntry->permissions = LXFS_DEFAULT_PERMS;
+
+            // temporary test
+            newEntry->name[0] = 'a';
+            newEntry->name[1] = 'b';
+            newEntry->name[2] = 0;
+
+            // and update the table on disk
+            uint64_t tableBlock = parentEntry->block;
+            tableBlock += (offset/BLOCK_SIZE_BYTES);
+            uint64_t blockOffset = offset%BLOCK_SIZE_BYTES;
+            writeBlock(disk, partition, tableBlock, 1, parentData.data() + blockOffset);
+
+            return 0;
+        } else {
+            newEntry = (LXFSDirectoryEntry *)((char *)newEntry + newEntry->entrySize);
+            offset += newEntry->entrySize;
+
+            // TODO: reallocate these blocks as necessary when growing
+        }
+    }
+
+    return -1;
 }

@@ -22,3 +22,23 @@ int countPath(string path) {
 
     return count;
 }
+
+string parentPath(string path) {
+    int count = countPath(path);
+    if(count <= 1) return path;     // root has no parent
+    count -= 1;
+
+    int currentCount = 0;
+    string parent = "";
+
+    for(int i = 0; i < path.length(); i++) {
+        parent += path[i];
+
+        if(path[i] == '/') {
+            currentCount++;
+            if(currentCount >= count) return parent;
+        }
+    }
+
+    return parent;
+}

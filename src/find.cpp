@@ -46,7 +46,7 @@ bool findEntry(string disk, int partition, string path, LXFSDirectoryEntry *dest
     // now read the series of blocks
     uint64_t current = start;
     size_t size = 0, newSize = 0;
-    vector<uint8_t> data(10000);
+    vector<uint8_t> data(0);
 
     while(current != LXFS_BLOCK_EOF) {
         //cerr << "read block 0x" << hex << uppercase << current;
