@@ -79,7 +79,7 @@ uint64_t allocateNewBlocks(string disk, int partition, size_t blockCount) {
 
     for(size_t i = 0; i < blockCount; i++) {
         blocks[i] = findFreeBlock(disk, partition, i);
-        cout << "found free block " << dec << blocks[i] << " for index " << dec << i << endl;
+        //cout << "found free block " << dec << blocks[i] << " for index " << dec << i << endl;
     }
 
     // update the table on disk
