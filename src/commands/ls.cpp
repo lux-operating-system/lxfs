@@ -12,6 +12,57 @@ int lsHelp(char *name) {
     return -1;
 }
 
+void printEntry(LXFSDirectoryEntry *entry, char *override) {
+    if(entry->flags & LXFS_DIR_VALID) {
+        switch((entry->flags >> LXFS_DIR_TYPE_SHIFT) & LXFS_DIR_TYPE_MASK) {
+        case LXFS_DIR_TYPE_DIR:
+            cout << "d";
+            break;
+        case LXFS_DIR_TYPE_HARD_LINK:
+            cout << "l";
+            break;
+        default:
+            cout << "-";
+        }
+    }
+
+    // owner perms
+    cout << (entry->permissions & LXFS_PERMS_OWNER_R ? "r" : "-");
+    cout << (entry->permissions & LXFS_PERMS_OWNER_W ? "w" : "-");
+    cout << (entry->permissions & LXFS_PERMS_OWNER_X ? "x" : "-");
+    
+    // group perms
+    cout << (entry->permissions & LXFS_PERMS_GROUP_R ? "r" : "-");
+    cout << (entry->permissions & LXFS_PERMS_GROUP_W ? "w" : "-");
+    cout << (entry->permissions & LXFS_PERMS_GROUP_X ? "x" : "-");
+
+    // Other perms
+    cout << (entry->permissions & LXFS_PERMS_OTHER_R ? "r" : "-");
+    cout << (entry->permissions & LXFS_PERMS_OTHER_W ? "w" : "-");
+    cout << (entry->permissions & LXFS_PERMS_OTHER_X ? "x" : "-");
+
+    cout << " ";
+
+    // owner ID and group ID
+    // for now just print the actual numbers
+    cout << hex << setw(4) << setfill('0') << entry->owner << " ";
+    cout << hex << setw(4) << setfill('0') << entry->group << " ";
+
+    // size
+    cout << dec << setw(4) << setfill(' ') << entry->size << " ";
+
+    // TODO: human-readable date and time go here
+
+    // name
+    if(override) {
+        cout << override;
+    } else {
+        cout << entry->name;
+    }
+
+    cout << endl;
+}
+
 int ls(int argc, char **argv) {
     if(argc < 5) return lsHelp(argv[0]);
 
@@ -33,6 +84,12 @@ int ls(int argc, char **argv) {
         cerr << "this entry is not a directory" << endl;
         return -1;
     }
+
+    // now list the directory
+    cout << "directory listing for " << path << ":" << endl;
+
+    // first with the directory itself
+    printEntry(entry, ".");
 
     return 0;
 }

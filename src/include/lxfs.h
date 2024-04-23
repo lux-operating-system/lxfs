@@ -100,7 +100,7 @@ typedef struct {
     uint64_t block;
     uint16_t entrySize;
     uint8_t reserved[14];
-    uint8_t name[];
+    uint8_t name[512];
 } __attribute__((packed)) LXFSDirectoryEntry;
 
 #define LXFS_DIR_VALID              0x0001
