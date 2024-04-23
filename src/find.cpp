@@ -64,12 +64,10 @@ start:
             string dir = splitPath(path, i);
             
             // now search this directory for the entry
-            while(entry->flags) {
-                if(entry->flags & LXFS_DIR_VALID) {
-                    if(!strcmp(dir.c_str(), (char *)entry->name)) {
-                        found = true;
-                        break;
-                    }
+            while(entry->flags && entry->entrySize) {
+                if((entry->flags & LXFS_DIR_VALID) && (!strcmp(dir.c_str(), (char *)entry->name))) {
+                    found = true;
+                    break;
                 } else {
                     entry = (LXFSDirectoryEntry *)((char *)entry + entry->entrySize);
                 }
