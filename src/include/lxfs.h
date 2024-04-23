@@ -137,6 +137,7 @@ int create(int, char **);
 int format(int, char **);
 int part(int, char **);
 int ls(int, char **);
+int cp(int, char **);
 
 void *readBytes(string, size_t, size_t, void *);
 void writeBytes(string, size_t, size_t, void *);
@@ -148,3 +149,4 @@ uint64_t readNextBlock(string, int, uint64_t, void *);
 uint64_t rootDirectoryBlock(string, int);
 int countPath(string);
 bool findEntry(string, int, string, LXFSDirectoryEntry *);
+uint64_t allocateNewBlocks(string, int, size_t);
