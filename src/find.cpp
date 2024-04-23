@@ -10,11 +10,9 @@
 bool findEntry(string disk, int partition, string path, LXFSDirectoryEntry *dest) {
     int pathSize = countPath(path);
 
-    uint64_t start = 0;
-
     if(pathSize == 1) {
         // root directory
-        start = rootDirectoryBlock(disk, partition);
+        uint64_t start = rootDirectoryBlock(disk, partition);
 
         vector<uint8_t> rootBlock(BLOCK_SIZE_BYTES);
         readBlock(disk, partition, start, 1, rootBlock.data());
@@ -36,28 +34,58 @@ bool findEntry(string disk, int partition, string path, LXFSDirectoryEntry *dest
 
         return true;
     } else {
-        cerr << "TODO: find non-root directories" << endl;
-        dest->flags = 0;
+        // non-root directories, we're gonna have to follow the hierarchy
+        LXFSDirectoryEntry *entry = new LXFSDirectoryEntry;
+        findEntry(disk, partition, "/", entry);
+
+start:
+        // from here on it's generic
+        if(((entry->flags >> LXFS_DIR_TYPE_SHIFT) & LXFS_DIR_TYPE_MASK) != LXFS_DIR_TYPE_DIR) {
+            cerr << "a non-directory cannot have children" << endl;
+            return -1;
+        }
+
+        uint64_t current = entry->block;;
+        size_t size = 0, newSize = 0;
+        vector<uint8_t> data(0);
+
+        while(current != LXFS_BLOCK_EOF) {
+            newSize += BLOCK_SIZE_BYTES;
+            data.resize(newSize);
+            current = readNextBlock(disk, partition, current, data.data() + size);
+            size = newSize;
+        }
+
+        // and start reading from it
+        entry = (LXFSDirectoryEntry *)((char *)data.data() + sizeof(LXFSDirectoryHeader));
+
+        for(int i = 1; i < pathSize; i++) {
+            bool found = false;
+            string dir = splitPath(path, i);
+            
+            // now search this directory for the entry
+            while(entry->flags) {
+                if(entry->flags & LXFS_DIR_VALID) {
+                    if(!strcmp(dir.c_str(), (char *)entry->name)) {
+                        found = true;
+                        break;
+                    }
+                } else {
+                    entry = (LXFSDirectoryEntry *)((char *)entry + entry->entrySize);
+                }
+            }
+
+            if(found) {
+                if(i == pathSize-1) {
+                    memcpy(dest, entry, entry->entrySize);
+                    return true;
+                } else {
+                    goto start;
+                }
+            }
+        }
+
+        // file doesn't exist here
         return false;
     }
-
-    //cout << "directory starts at block " << dec << setw(0) << start << "; ";
-
-    // now read the series of blocks
-    uint64_t current = start;
-    size_t size = 0, newSize = 0;
-    vector<uint8_t> data(0);
-
-    while(current != LXFS_BLOCK_EOF) {
-        //cerr << "read block 0x" << hex << uppercase << current;
-
-        newSize += BLOCK_SIZE_BYTES;
-        data.resize(newSize);
-        current = readNextBlock(disk, partition, current, data.data() + size);
-        size = newSize;
-
-        //cerr << "; next block 0x" << hex << uppercase << current << endl;
-    }
-
-    //cout << "size " << dec << setw(0) << size/BLOCK_SIZE_BYTES << endl;
 }
