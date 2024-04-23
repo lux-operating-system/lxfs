@@ -138,6 +138,7 @@ int format(int, char **);
 int part(int, char **);
 int ls(int, char **);
 int cp(int, char **);
+int cat(int, char **);
 
 void *readBytes(string, size_t, size_t, void *);
 void writeBytes(string, size_t, size_t, void *);

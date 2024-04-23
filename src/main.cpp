@@ -38,6 +38,8 @@ int main(int argc, char **argv) {
         return ls(argc, argv);
     } else if(!strcmp(argv[1], "cp")) {
         return cp(argc, argv);
+    } else if(!strcmp(argv[1], "cat")) {
+        return cat(argc, argv);
     }
 
     cerr << "Undefined command " << argv[1] << ", use '" << argv[0] << " help' for a list of commands." << endl;
