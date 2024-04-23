@@ -37,7 +37,8 @@ bool findEntry(string disk, int partition, string path, LXFSDirectoryEntry *dest
         return true;
     } else {
         cerr << "TODO: find non-root directories" << endl;
-        return -1;
+        dest->flags = 0;
+        return false;
     }
 
     //cout << "directory starts at block " << dec << setw(0) << start << "; ";

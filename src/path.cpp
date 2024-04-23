@@ -16,5 +16,9 @@ int countPath(string path) {
         }
     }
 
+    if(path.length() > 1 && path[path.length()-1] != '/') {
+        return count+1;
+    }
+
     return count;
 }
