@@ -50,3 +50,25 @@ string finalPath(string path) {
     string parent = parentPath(path);
     return path.substr(parent.length(), path.length()-parent.length());
 }
+
+string splitPath(string path, int index) {
+    if(!index) return path;
+
+    //cout << "split " << path << " as part " << dec << index << endl;
+
+    int current = 0;
+    int start = 0;
+    int end = path.length()-1;
+    for(int i = 0; i < path.length(); i++) {
+        if(path[i] == '/') {
+            //cout << "found / at position " << dec << i << endl;
+            current++;
+
+            if(current == index) start = i+1;
+            else if(current == index+1) end = i-start;
+        }
+    }
+
+    //cout << "start " << dec << start << " end " << dec << end << endl;
+    return path.substr(start, end);
+}
