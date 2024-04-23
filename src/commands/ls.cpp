@@ -91,5 +91,27 @@ int ls(int argc, char **argv) {
     // first with the directory itself
     printEntry(entry, ".");
 
+    // and then its children by loading the directory
+    uint64_t current = entry->block;
+    size_t size = 0, newSize = 0;
+    vector<uint8_t> data(0);
+
+    while(current != LXFS_BLOCK_EOF) {
+        newSize += BLOCK_SIZE_BYTES;
+        data.resize(newSize);
+        current = readNextBlock(disk, partition, current, data.data() + size);
+        size = newSize;
+    }
+
+    LXFSDirectoryEntry *child = (LXFSDirectoryEntry *)((char *)data.data() + sizeof(LXFSDirectoryHeader));
+    size_t offset = sizeof(LXFSDirectoryHeader);
+    while(offset < size) {
+        if(!child->flags) return 0;
+        if(child->flags & LXFS_DIR_VALID) {
+            printEntry(child, nullptr);
+            child = (LXFSDirectoryEntry *)((char *)child + child->entrySize);
+        }
+    }
+
     return 0;
 }

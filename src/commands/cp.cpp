@@ -20,6 +20,7 @@ int cp(int argc, char **argv) {
     string src = argv[4];
     string dst = argv[5];
     string parent = parentPath(dst);
+    string name = finalPath(dst);
 
     // get the parent directory
     LXFSDirectoryEntry *parentEntry = new LXFSDirectoryEntry;
@@ -64,11 +65,16 @@ int cp(int argc, char **argv) {
             newEntry->name[1] = 'b';
             newEntry->name[2] = 0;
 
+            newEntry->entrySize = sizeof(LXFSDirectoryEntry)-512 + 
+
             // and update the table on disk
             uint64_t tableBlock = parentEntry->block;
             tableBlock += (offset/BLOCK_SIZE_BYTES);
-            uint64_t blockOffset = offset%BLOCK_SIZE_BYTES;
+            uint64_t blockOffset = (offset%BLOCK_SIZE_BYTES) / BLOCK_SIZE_BYTES;
             writeBlock(disk, partition, tableBlock, 1, parentData.data() + blockOffset);
+
+            cout << "updating block " << dec << tableBlock << endl;
+            cout << "parent dir started at " << dec << parentEntry->block << endl;
 
             return 0;
         } else {
