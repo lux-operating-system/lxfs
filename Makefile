@@ -22,4 +22,10 @@ test:
 	./lxfs create disk.hdd 5
 	./lxfs format disk.hdd 4
 	./lxfs part disk.hdd
-	
+	./lxfs ls disk.hdd 0 /
+	./lxfs cp disk.hdd 0 ./testfiles/hello.txt /hello.txt
+	./lxfs cp disk.hdd 0 ./testfiles/hello2.txt /hello2.txt
+	./lxfs ls disk.hdd 0 /
+	./lxfs cat disk.hdd 0 /hello.txt
+	./lxfs cat disk.hdd 0 /hello2.txt
+	./lxfs cat disk.hdd 0 /nonexistent.txt
