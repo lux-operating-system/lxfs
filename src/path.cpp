@@ -42,3 +42,11 @@ string parentPath(string path) {
 
     return parent;
 }
+
+string finalPath(string path) {
+    int count = countPath(path);
+    if(count <= 1) return path;     // again for root
+    
+    string parent = parentPath(path);
+    return path.substr(parent.length(), path.length()-parent.length());
+}

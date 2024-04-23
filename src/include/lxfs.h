@@ -151,3 +151,4 @@ int countPath(string);
 bool findEntry(string, int, string, LXFSDirectoryEntry *);
 uint64_t allocateNewBlocks(string, int, size_t);
 string parentPath(string);
+string finalPath(string);
