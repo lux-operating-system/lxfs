@@ -22,21 +22,6 @@ using namespace std;
 #define BLOCK_SIZE          4       // 4 sectors per block, just a default
 #define BLOCK_SIZE_BYTES    (SECTOR_SIZE*BLOCK_SIZE)
 
-int create(int, char **);
-int format(int, char **);
-int part(int, char **);
-int ls(int, char **);
-
-void *readBytes(string, size_t, size_t, void *);
-void writeBytes(string, size_t, size_t, void *);
-void *readSector(string, size_t, size_t, void *);
-void writeSector(string, size_t, size_t, void *);
-void *readBlock(string, int, size_t, size_t, void *);
-void writeBlock(string, int, size_t, size_t, void *);
-uint64_t readNextBlock(string, int, uint64_t, void *);
-uint64_t rootDirectoryBlock(string, int);
-int countPath(string);
-
 typedef struct {
     uint8_t flags;
     uint8_t chsStart[3];
@@ -138,6 +123,8 @@ typedef struct {
 #define LXFS_PERMS_OTHER_W          0x0080
 #define LXFS_PERMS_OTHER_X          0x0100
 
+#define LXFS_DEFAULT_PERMS          (LXFS_PERMS_OWNER_R | LXFS_PERMS_OWNER_W | LXFS_PERMS_OWNER_X | LXFS_PERMS_GROUP_R | LXFS_PERMS_GROUP_X | LXFS_PERMS_OTHER_R | LXFS_PERMS_OTHER_X);
+
 #define LXFS_USER_ROOT              0x0000
 
 typedef struct {
@@ -145,3 +132,19 @@ typedef struct {
     uint64_t refCount;
 } __attribute__((packed)) LXFSFileHeader;
 
+
+int create(int, char **);
+int format(int, char **);
+int part(int, char **);
+int ls(int, char **);
+
+void *readBytes(string, size_t, size_t, void *);
+void writeBytes(string, size_t, size_t, void *);
+void *readSector(string, size_t, size_t, void *);
+void writeSector(string, size_t, size_t, void *);
+void *readBlock(string, int, size_t, size_t, void *);
+void writeBlock(string, int, size_t, size_t, void *);
+uint64_t readNextBlock(string, int, uint64_t, void *);
+uint64_t rootDirectoryBlock(string, int);
+int countPath(string);
+bool findEntry(string, int, string, LXFSDirectoryEntry *);
