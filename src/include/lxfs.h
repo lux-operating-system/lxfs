@@ -146,6 +146,7 @@ void writeSector(string, size_t, size_t, void *);
 void *readBlock(string, int, size_t, size_t, void *);
 void writeBlock(string, int, size_t, size_t, void *);
 uint64_t readNextBlock(string, int, uint64_t, void *);
+uint64_t writeNextBlock(string, int, uint64_t, void *);
 uint64_t rootDirectoryBlock(string, int);
 int countPath(string);
 bool findEntry(string, int, string, LXFSDirectoryEntry *);

@@ -53,7 +53,7 @@ uint64_t findFreeBlock(string disk, int partition, int index) {
         block = getNextBlock(disk, partition, i);
         if(block == LXFS_BLOCK_FREE) currentIndex++;
 
-        if(currentIndex > index) return block;
+        if(currentIndex > index) return i;
     }
 
     return LXFS_BLOCK_EOF;
@@ -79,6 +79,7 @@ uint64_t allocateNewBlocks(string disk, int partition, size_t blockCount) {
 
     for(size_t i = 0; i < blockCount; i++) {
         blocks[i] = findFreeBlock(disk, partition, i);
+        cout << "found free block " << dec << blocks[i] << " for index " << dec << i << endl;
     }
 
     // update the table on disk
@@ -87,4 +88,9 @@ uint64_t allocateNewBlocks(string disk, int partition, size_t blockCount) {
     }
 
     return blocks[0];
+}
+
+uint64_t writeNextBlock(string disk, int partition, uint64_t block, void *buffer) {
+    writeBlock(disk, partition, block, 1, buffer);
+    return getNextBlock(disk, partition, block);
 }

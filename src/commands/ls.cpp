@@ -106,11 +106,13 @@ int ls(int argc, char **argv) {
     LXFSDirectoryEntry *child = (LXFSDirectoryEntry *)((char *)data.data() + sizeof(LXFSDirectoryHeader));
     size_t offset = sizeof(LXFSDirectoryHeader);
     while(offset < size) {
-        if(!child->flags) return 0;
+        if(!child->flags || !child->entrySize) return 0;
         if(child->flags & LXFS_DIR_VALID) {
             printEntry(child, nullptr);
             child = (LXFSDirectoryEntry *)((char *)child + child->entrySize);
         }
+
+        offset += child->entrySize;
     }
 
     return 0;
