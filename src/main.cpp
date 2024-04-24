@@ -19,6 +19,7 @@ int help(char *name) {
     cerr << " format    - Creates and formats an lxfs volume on a disk image" << endl;
     cerr << " help      - Shows this message" << endl;
     cerr << " ls        - Directory listing" << endl;
+    cerr << " mbr       - Copies a master boot record to the disk image" << endl;
     cerr << " mkdir     - Creates a directory on the disk image" << endl;
     cerr << " part      - Shows the partition table of the disk image" << endl;
 
@@ -40,6 +41,8 @@ int main(int argc, char **argv) {
         return cp(argc, argv);
     } else if(!strcmp(argv[1], "cat")) {
         return cat(argc, argv);
+    } else if(!strcmp(argv[1], "mbr")) {
+        return mbr(argc, argv);
     }
 
     cerr << "Undefined command " << argv[1] << ", use '" << argv[0] << " help' for a list of commands." << endl;
