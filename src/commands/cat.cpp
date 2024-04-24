@@ -46,6 +46,6 @@ int cat(int argc, char **argv) {
         cout << ptr[i];
     }
 
-    cout << endl;
+    //cout << endl;
     return 0;
 }
