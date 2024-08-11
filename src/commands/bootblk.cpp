@@ -31,5 +31,12 @@ int bootblk(int argc, char **argv) {
     file.read((char *)data.data() + BLOCK_SIZE_BYTES, fileSize);
     file.close();
 
+    // add the time
+    time_t now = time(nullptr);
+    LXFSBootHeader *boot = (LXFSBootHeader *)data.data();
+    boot->timestamp = (uint64_t)now;
+    cout << "lxfs: installed boot program for " << boot->description << endl;
+
     writeBlock(disk, 0, 1, sizeBlocks, data.data());
+    return 0;
 }
