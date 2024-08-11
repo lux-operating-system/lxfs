@@ -24,12 +24,13 @@ int bootblk(int argc, char **argv) {
     file.clear();
     file.seekg(0);
 
-    // vector for the file data, rounded up to the nearest block + 1
+    // round up to the nearest block size
     size_t sizeBlocks = (fileSize + BLOCK_SIZE_BYTES - 1) / BLOCK_SIZE_BYTES;
-    sizeBlocks++;       // one extra block for metadata
     vector<uint8_t> data(sizeBlocks*BLOCK_SIZE_BYTES);
-    file.read((char *)data.data() + BLOCK_SIZE_BYTES, fileSize);
+    file.read((char *)data.data(), fileSize);
     file.close();
+
+    //cout << "lxfs: boot program size is " << dec << fileSize << endl;
 
     // add the time
     time_t now = time(nullptr);
