@@ -47,6 +47,8 @@ int main(int argc, char **argv) {
         return boot(argc, argv);
     } else if(!strcmp(argv[1], "bootsec")) {
         return bootsec(argc, argv);
+    } else if(!strcmp(argv[1], "bootblk")) {
+        return bootblk(argc, argv);
     }
 
     cerr << "Undefined command " << argv[1] << ", use '" << argv[0] << " help' for a list of commands." << endl;

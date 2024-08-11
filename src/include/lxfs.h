@@ -142,6 +142,7 @@ int cat(int, char **);
 int mbr(int, char **);
 int boot(int, char **);
 int bootsec(int, char **);
+int bootblk(int, char **);
 
 void *readBytes(string, size_t, size_t, void *);
 void writeBytes(string, size_t, size_t, void *);
