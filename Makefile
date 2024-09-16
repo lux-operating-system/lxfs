@@ -15,7 +15,7 @@ clean:
 	@$(CXX) $(CXXFLAGS) -o $@ $<
 
 lxfs: $(OBJ)
-	@echo "\x1B[0;1;34m ld  \x1B[0m lxfs"
+	@echo "\x1B[0;1;93m ld  \x1B[0m lxfs"
 	@$(LD) $(LDFLAGS) $(OBJ) -o lxfs
 
 test:
