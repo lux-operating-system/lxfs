@@ -12,7 +12,7 @@ int lsHelp(char *name) {
     return -1;
 }
 
-void printEntry(LXFSDirectoryEntry *entry, char *override) {
+void printEntry(LXFSDirectoryEntry *entry, const char *override) {
     if(entry->flags & LXFS_DIR_VALID) {
         switch((entry->flags >> LXFS_DIR_TYPE_SHIFT) & LXFS_DIR_TYPE_MASK) {
         case LXFS_DIR_TYPE_DIR:
@@ -70,8 +70,6 @@ int ls(int argc, char **argv) {
     int partition = stoi(argv[3]);
     string path = argv[4];
 
-    bool isRootDirectory = (countPath(path) <= 1);
-
     // find the path
     LXFSDirectoryEntry *entry = new LXFSDirectoryEntry;
     if(!findEntry(disk, partition, path, entry)) {
@@ -89,7 +87,7 @@ int ls(int argc, char **argv) {
     cout << "directory listing for " << path << ":" << endl;
 
     // first with the directory itself
-    printEntry(entry, ".");
+    printEntry(entry, (const char *)".");
 
     // and then its children by loading the directory
     uint64_t current = entry->block;
