@@ -38,6 +38,6 @@ int bootblk(int argc, char **argv) {
     boot->timestamp = (uint64_t)now;
     cout << "lxfs: installed boot program for " << boot->description << endl;
 
-    writeBlock(disk, 0, 1, sizeBlocks, data.data());
+    writeBlock(disk, partition, 1, sizeBlocks, data.data());
     return 0;
 }
