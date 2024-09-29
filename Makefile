@@ -28,4 +28,8 @@ test:
 	./lxfs ls disk.hdd 0 /
 	./lxfs cat disk.hdd 0 /hello.txt
 	./lxfs cat disk.hdd 0 /hello2.txt
-	./lxfs cat disk.hdd 0 /nonexistent.txt
+	./lxfs mkdir disk.hdd 0 /directory
+	./lxfs ls disk.hdd 0 /
+	./lxfs mkdir disk.hdd 0 /directory/dir2
+	./lxfs ls disk.hdd 0 /
+	./lxfs ls disk.hdd 0 /directory
