@@ -69,7 +69,7 @@ int cp(int argc, char **argv) {
         if(!(newEntry->flags & LXFS_DIR_VALID)) {
             // found a free entry
             newEntry->flags = LXFS_DIR_VALID;
-            newEntry->flags |= (LXFS_DIR_TYPE_FILE << LXFS_DIR_TYPE_MASK);
+            newEntry->flags |= (LXFS_DIR_TYPE_FILE << LXFS_DIR_TYPE_SHIFT);
 
             newEntry->owner = LXFS_USER_ROOT;
             newEntry->group = LXFS_USER_ROOT;
