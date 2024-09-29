@@ -55,6 +55,7 @@ int mkdir(int argc, char **argv) {
             // found a free entry
             newEntry->flags = LXFS_DIR_VALID;
             newEntry->flags |= (LXFS_DIR_TYPE_DIR << LXFS_DIR_TYPE_SHIFT);
+            newEntry->flags |= (name.length() - 1) << 3;
 
             newEntry->owner = LXFS_USER_ROOT;
             newEntry->group = LXFS_USER_ROOT;
